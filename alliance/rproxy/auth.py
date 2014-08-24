@@ -3,7 +3,7 @@ import base64
 from oslo.config import cfg
 
 from alliance.thrift.service.ttypes import TokenRequest
-from alliance.thrift.client import alliance_client
+from alliance.tclient import alliance_client
 from alliance.thrift.service.ttypes import AException
 from alliance.common import crypto_utils
 from alliance.common import dtos
@@ -50,7 +50,7 @@ class AuthResource(object):
         token_response = self.allianceClient.client().validateTokenHard(token_request)
         if token_response.response_data:
             token_dto = self._unwrap_token_dto(cloud_id_target, token_response.response_data)
-        
+        print token_dto
 
     def validate_uuid_token_soft(self, token_id):
         pass

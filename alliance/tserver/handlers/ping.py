@@ -1,6 +1,7 @@
 
-from . import HandlerBase
 from alliance.thrift.service.ttypes import Pong
+
+from . import HandlerBase
 from alliance.common import utils
 from alliance.common.exception import ErrorCode
 from alliance.common import exception

@@ -5,9 +5,9 @@ Created on Jul 12, 2014
 '''
 from alliance.common import utils
 from alliance.common import exception
-from alliance.thrift.server.handlers.ping import PingHandler
-from alliance.thrift.server.handlers.session import SessionHandler
-from alliance.thrift.server.handlers.auth import AuthHandler
+from alliance.tserver.handlers.ping import PingHandler
+from alliance.tserver.handlers.session import SessionHandler
+from alliance.tserver.handlers.auth import AuthHandler
 from alliance.thrift.service.ttypes import AException
 
 LOG = utils.getLogger(__name__)

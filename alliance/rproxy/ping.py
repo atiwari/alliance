@@ -4,7 +4,7 @@ from alliance.thrift.service.ttypes import AException
 from alliance.common import dtos
 from alliance.common import crypto_utils
 from alliance.common import exception
-from alliance.thrift.client import alliance_client
+from alliance.tclient import alliance_client
 
 from alliance.openstack.common import gettextutils as u
 

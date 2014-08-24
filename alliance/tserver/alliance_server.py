@@ -2,7 +2,7 @@ from oslo.config import cfg
 
 from alliance.openstack.common import log
 from alliance.thrift.service import AllianceService
-from alliance.thrift.server.processor import AllianceProcessor
+from alliance.tserver.processor import AllianceProcessor
 from alliance.common import utils
 from alliance.common import config
 

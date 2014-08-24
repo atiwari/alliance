@@ -10,7 +10,7 @@ from alliance.common import exception
 from alliance.common.exception import ErrorCode
 from alliance.model import repositories
 from alliance.model import models
-from alliance.thrift.client import alliance_client
+from alliance.tclient import alliance_client
 
 import json
 LOG = utils.getLogger(__name__)
