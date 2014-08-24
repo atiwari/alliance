@@ -1,6 +1,7 @@
 """
-Resources are used by local services (e.g. Keystone)
-This is an interface for local service to access remote alliance.
+rproxy(s) are interface to the remote alliance server.
+Local services e.g. keystone can use rproxy to 
+call remote alliance
 
-(keystone) ----> (resource) | (alliance)
+(keystone --> rproxy) | (alliance)
 """
