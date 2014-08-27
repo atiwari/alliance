@@ -88,12 +88,16 @@ How to play with it
 4. to setup db. run WhenTestingPartnerRepo test from alliance/tests/model, this is kind of bootstrap script for now.
 5. run the alliance server "alliance/tserver/alliance_server.py" has main block.
 6. run "alliance/rproxy/ping.py"
+    ```
     if you are getting "###### Fun playing ping, pong with my-east-cloud-or-dc" that means you are good. 
+    ```
 7. now run "alliance/rproxy/session.py", if you are getting below response that means you are good.
+        ```
         my-east-cloud-or-dc
         rB6vxK/Wp9eBdjJRX21mn48xb3rXLfBwUrEjnyhhM08=
         2014-08-27 15:13:11.452498
         2014-08-28 01:13:11.452515
+        ```
 8. Start keystone server locally as per parameter in alliance.conf.
 9. create a another user and get scoped token.
 10. update "alliance/rproxy/auth.py" and run the same. you should see the auth response.
