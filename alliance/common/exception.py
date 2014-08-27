@@ -79,12 +79,6 @@ class FeatureNotImplemented(AllianceException):
         self.invalid_field = kwargs.get('field')
 
 """
-raise exception.FeatureNotImplemented(field='type',
-                                                  schema=schema_name,
-                                                  reason=u._("Feature not"
-                                                             " implemented for"
-                                                             " 'certificate'")
-                                                  )
 class MissingArgumentError(AllianceException):
     message = u._("Missing required argument.")
 

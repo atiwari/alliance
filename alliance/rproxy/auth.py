@@ -20,9 +20,9 @@ CONF = cfg.CONF
 
 class AuthResource(object):
 
-    def __init__(self, allianceClient=None, cloud_id_self=None, cloud_id_target=None):
-        self.allianceClient = allianceClient or alliance_client.AllianceClient()
-        self.cloud_id_self = cloud_id_self or 'hp-helion-west-cloud-dc'
+    def __init__(self, allianceClient=None, cloud_id_self=None):
+        self.cloud_id_self = cloud_id_self
+        self.allianceClient = allianceClient
         self.aes_crypto = crypto_utils.AESCrypto()
         self.json_encoder = utils.JsonEncoder()
 
@@ -36,7 +36,6 @@ class AuthResource(object):
         key_dto = dtos.KeyDTO(key=base64.b64decode(session.session_key))
         return json.loads(self.aes_crypto.decrypt(auth_token_dto_ENC, key_dto))
 
-
     def validate_uuid_token_hard(self, cloud_id_target, token_id):
         token_dto = dtos.AuthTokenDTO()
         token_dto.cloud_id = cloud_id_target
@@ -49,8 +48,9 @@ class AuthResource(object):
 
         token_response = self.allianceClient.client().validateTokenHard(token_request)
         if token_response.response_data:
-            token_dto = self._unwrap_token_dto(cloud_id_target, token_response.response_data)
-        print token_dto
+            token_json = self._unwrap_token_dto(cloud_id_target, token_response.response_data)
+        return dtos.AuthTokenDTO(token_json)
+
 
     def validate_uuid_token_soft(self, token_id):
         pass
@@ -61,13 +61,10 @@ class AuthResource(object):
 if __name__ == '__main__':
     try:
         """Quick test code"""
-        authHelper = AuthResource()
-        cloud_id_target = 'hp-helion-east-cloud-dc'
-        session_dto = authHelper.validate_uuid_token_hard(cloud_id_target, "5159dadc8d7a441985c4dcd2f0ba4b1f")
-        #print session_dto.cloud_id
-        #print session_dto.session_key
-        #print session_dto.login_time
-        #print session_dto.valid_till
-    
+        cloud_id_target = 'my-east-cloud-or-dc'
+        alliance_client = alliance_client.AllianceClient(cloud_id_target='my-east-cloud-or-dc')
+        authResource = AuthResource(allianceClient=alliance_client, cloud_id_self='my-west-cloud-or-dc')
+        auth_response = authResource.validate_uuid_token_hard(cloud_id_target, "ff8ff5ee85da44ddb1137f9ad40bd17d")
+        print auth_response.validation_code
     except AException as e:
         print e

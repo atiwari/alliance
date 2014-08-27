@@ -23,8 +23,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print 'Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] function [arg1 [arg2...]]'
   print ''
   print 'Functions:'
-  print '  Pong ping(SessionTKT SessionTKT)'
   print '  SessionTKT getSession(SessionTKT SessionTKT)'
+  print '  PingResponse ping(PingRequest request)'
   print '  TokenResponse validateTokenHard(TokenRequest req)'
   print '  TokenResponse validateTokenSoft(TokenRequest req)'
   print '  ServiceResponse getServices(ServiceRequest req)'
@@ -84,17 +84,17 @@ protocol = TBinaryProtocol.TBinaryProtocol(transport)
 client = AllianceService.Client(protocol)
 transport.open()
 
-if cmd == 'ping':
-  if len(args) != 1:
-    print 'ping requires 1 args'
-    sys.exit(1)
-  pp.pprint(client.ping(eval(args[0]),))
-
-elif cmd == 'getSession':
+if cmd == 'getSession':
   if len(args) != 1:
     print 'getSession requires 1 args'
     sys.exit(1)
   pp.pprint(client.getSession(eval(args[0]),))
+
+elif cmd == 'ping':
+  if len(args) != 1:
+    print 'ping requires 1 args'
+    sys.exit(1)
+  pp.pprint(client.ping(eval(args[0]),))
 
 elif cmd == 'validateTokenHard':
   if len(args) != 1:

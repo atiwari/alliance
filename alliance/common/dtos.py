@@ -53,5 +53,5 @@ class AuthTokenDTO(json.JSONEncoder):
         self.token_id = json.get('token_id') if json else None
         self.token_type = json.get('token_type') if json else None
         self.token_str = json.get('token_str') if json else None
-        self.validation_code = json.get('verify_code') if json else None
+        self.validation_code = json.get('validation_code') if json else None
         self.details = json.get('details') if json else None

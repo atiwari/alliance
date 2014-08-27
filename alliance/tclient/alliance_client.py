@@ -1,20 +1,27 @@
-import sys, glob
-
-from alliance.thrift.service import AllianceService
-from alliance.common import utils
-
 from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TCompactProtocol
 
+from alliance.common import utils
+from alliance.thrift.service import AllianceService
+
+
 LOG = utils.getLogger(__name__)
 
 class AllianceClient():
-
-    def __init__(self):
+    """
+        By default we are assuming that alliance
+        server is running locally.
+        Which is not the correct assumption.
+    """
+    def __init__(self, cloud_id_target=None, endpoint='localhost', port=9441):
+        """Using cloud_id_target we have to find the
+        alliance endpoints
+        """
+        LOG.debug('alliance client for %s' %cloud_id_target)
         # Make socket
-        self.tsocket = TSocket.TSocket('localhost', 9441)
+        self.tsocket = TSocket.TSocket(endpoint, port)
         # Buffering is critical. Raw sockets are very slow
         #self.transport = TTransport.TBufferedTransport(self.transport)
         self.transport = TTransport.TFramedTransport(self.tsocket)

@@ -75,50 +75,29 @@ class WhenCleaningRepositoryPagingParameters(testtools.TestCase):
             offset_arg=1,
             limit_arg=limit)
         self.assertEqual(clean_limit, self.CONF.max_limit_paging)
+
 """
-    def test_should_raise_exception_create_kek_datum_with_null_name(self):
-        repositories._ENGINE = mock.MagicMock()
-        tenant = mock.MagicMock(id="1")
-        plugin_name = None
-        suppress_exception = False
-        session = mock.MagicMock()
-        session.query.side_effect = sa_orm.exc.NoResultFound()
-
-        kek_repo = repositories.KEKDatumRepo()
-        self.assertRaises(exception.BarbicanException,
-                          kek_repo.find_or_create_kek_datum, tenant,
-                          plugin_name, suppress_exception, session)
-
-    def test_should_raise_exception_create_kek_datum_with_empty_name(self):
-        repositories._ENGINE = mock.MagicMock()
-        tenant = mock.MagicMock(id="1")
-        plugin_name = ""
-        suppress_exception = False
-        session = mock.MagicMock()
-        session.query.side_effect = sa_orm.exc.NoResultFound()
-
-        kek_repo = repositories.KEKDatumRepo()
-        self.assertRaises(exception.BarbicanException,
-                          kek_repo.find_or_create_kek_datum, tenant,
-                          plugin_name, suppress_exception, session)
+    (IMP)
+    The below test is used for bootstrap.
+    Modify and run it, it will create partners
+    Sorry this not very very clean. 
 """
-
-class WhenTestingParterRepo(testtools.TestCase):
+class WhenTestingPartnerRepo(testtools.TestCase):
 
     def setUp(self):
-        super(WhenTestingParterRepo, self).setUp()
+        super(WhenTestingPartnerRepo, self).setUp()
         self.CONF = cfg.CONF
         self.partner_repo = repositories.PartnerRepo()
 
-        self.parsed_secret_self = {'cloud_id': 'hp-helion-east-cloud-dc',
-                      'name': 'hp-helion-east-cloud-dc',
+        self.parsed_secret_self = {'cloud_id': 'my-east-cloud-or-dc',
+                      'name': 'my-east-cloud-or-dc',
                       'role': 'SELF',
                       'trust_status': 'ACTIVE',
                       'trust_since': datetime.datetime.now().isoformat(),
                       'trust_till': datetime.datetime.now().isoformat()}
 
-        self.parsed_secret = {'cloud_id': 'hp-helion-west-cloud-dc',
-                      'name': 'hp-helion-west-cloud-dc',
+        self.parsed_secret = {'cloud_id': 'my-west-cloud-or-dc',
+                      'name': 'my-west-cloud-or-dc',
                       'role': 'PROVIDER',
                       'trust_status': 'ACTIVE',
                       'trust_since': datetime.datetime.now().isoformat(),
@@ -131,15 +110,15 @@ class WhenTestingParterRepo(testtools.TestCase):
         partner_cloud = models.Partner(self.parsed_secret)
         self.partner_repo.create_from(partner_cloud)
 
-class WhenTestingParterSessionRepo(testtools.TestCase):
+class WhenTestingPartnerSessionRepo(testtools.TestCase):
 
     def setUp(self):
-        super(WhenTestingParterSessionRepo, self).setUp()
+        super(WhenTestingPartnerSessionRepo, self).setUp()
         self.CONF = cfg.CONF
         self.partner_session_repo = repositories.PartnerSession()
         self.partner_session = models.PartnerSession()
-        self.partner_session.cloud_id =  'hp-helion-west-cloud-dc'
-        self.partner_session.session_key = 'hp-helion-west-cloud-dc'
+        self.partner_session.cloud_id =  'my-west-cloud-or-dc'
+        self.partner_session.session_key = 'my-west-cloud-or-dc'
         self.now = datetime.datetime.now()
         self.nowp10 = datetime.datetime.now() + datetime.timedelta(hours=10)
         self.partner_session.login_time = self.now
@@ -151,10 +130,12 @@ class WhenTestingParterSessionRepo(testtools.TestCase):
         self.partner_session_repo.create_from(self.partner_session)
         #create ps2
         self.partner_session = models.PartnerSession()
-        self.partner_session.cloud_id =  'hp-helion-east-cloud-dc'
-        self.partner_session.session_key = 'hp-helion-west-cloud-dc'
+        self.partner_session.cloud_id =  'my-east-cloud-or-dc'
+        self.partner_session.session_key = 'my-west-cloud-or-dc'
         self.partner_session.login_time = self.now
-        self.partner_session.valid_till = self.nowp10
+        #Setting the valid till to now so that system
+        #wd not take this session is as valid 
+        self.partner_session.valid_till = self.now
         self.partner_session.status = models.States.ACTIVE
         
         self.partner_session_repo.create_from(self.partner_session)

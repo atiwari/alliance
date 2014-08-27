@@ -19,12 +19,12 @@ CONF = cfg.CONF
 class SessionResource(object):
 
     def __init__(self, allianceClient=None, cloud_id_self=None):
+        self.cloud_id_self = cloud_id_self
+        self.allianceClient = allianceClient
         self.aes_crypto = crypto_utils.AESCrypto()
         self.rsa_crypto = crypto_utils.RSACrypto()
         self.partner_repo = repositories.PartnerRepo()
         self.partner_session_repo = repositories.PartnerSession()
-        self.cloud_id_self = cloud_id_self or 'hp-helion-west-cloud-dc'
-        self.allianceClient = allianceClient or alliance_client.AllianceClient()
         self.json_encoder = utils.JsonEncoder()
 
     def _build_session_tkt(self, session_dto, rsa_key_dto_self, rsa_key_dto_partner):
@@ -124,9 +124,11 @@ class SessionResource(object):
 if __name__ == '__main__':
     try:
         """Quick test code"""
-        sessionHelper = SessionResource()
-        cloud_id_target = 'hp-helion-east-cloud-dc'
-        session_dto = sessionHelper.getSession(cloud_id_target)
+        cloud_id_target = 'my-east-cloud-or-dc'
+        alliance_client = alliance_client.AllianceClient(cloud_id_target='my-east-cloud-or-dc')
+        session_resource = SessionResource(allianceClient=alliance_client,
+                                           cloud_id_self='my-west-cloud-or-dc')
+        session_dto = session_resource.getSession(cloud_id_target)
         print session_dto.cloud_id
         print session_dto.session_key
         print session_dto.login_time

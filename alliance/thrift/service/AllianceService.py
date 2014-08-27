@@ -18,17 +18,17 @@ except:
 
 
 class Iface:
-  def ping(self, SessionTKT):
+  def getSession(self, SessionTKT):
     """
     Parameters:
      - SessionTKT
     """
     pass
 
-  def getSession(self, SessionTKT):
+  def ping(self, request):
     """
     Parameters:
-     - SessionTKT
+     - request
     """
     pass
 
@@ -96,38 +96,6 @@ class Client(Iface):
       self._oprot = oprot
     self._seqid = 0
 
-  def ping(self, SessionTKT):
-    """
-    Parameters:
-     - SessionTKT
-    """
-    self.send_ping(SessionTKT)
-    return self.recv_ping()
-
-  def send_ping(self, SessionTKT):
-    self._oprot.writeMessageBegin('ping', TMessageType.CALL, self._seqid)
-    args = ping_args()
-    args.SessionTKT = SessionTKT
-    args.write(self._oprot)
-    self._oprot.writeMessageEnd()
-    self._oprot.trans.flush()
-
-  def recv_ping(self):
-    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
-    if mtype == TMessageType.EXCEPTION:
-      x = TApplicationException()
-      x.read(self._iprot)
-      self._iprot.readMessageEnd()
-      raise x
-    result = ping_result()
-    result.read(self._iprot)
-    self._iprot.readMessageEnd()
-    if result.success is not None:
-      return result.success
-    if result.allEx is not None:
-      raise result.allEx
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "ping failed: unknown result");
-
   def getSession(self, SessionTKT):
     """
     Parameters:
@@ -159,6 +127,38 @@ class Client(Iface):
     if result.allEx is not None:
       raise result.allEx
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getSession failed: unknown result");
+
+  def ping(self, request):
+    """
+    Parameters:
+     - request
+    """
+    self.send_ping(request)
+    return self.recv_ping()
+
+  def send_ping(self, request):
+    self._oprot.writeMessageBegin('ping', TMessageType.CALL, self._seqid)
+    args = ping_args()
+    args.request = request
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_ping(self):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = ping_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    if result.allEx is not None:
+      raise result.allEx
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "ping failed: unknown result");
 
   def validateTokenHard(self, req):
     """
@@ -367,8 +367,8 @@ class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
     self._processMap = {}
-    self._processMap["ping"] = Processor.process_ping
     self._processMap["getSession"] = Processor.process_getSession
+    self._processMap["ping"] = Processor.process_ping
     self._processMap["validateTokenHard"] = Processor.process_validateTokenHard
     self._processMap["validateTokenSoft"] = Processor.process_validateTokenSoft
     self._processMap["getServices"] = Processor.process_getServices
@@ -393,20 +393,6 @@ class Processor(Iface, TProcessor):
       self._processMap[name](self, seqid, iprot, oprot)
     return True
 
-  def process_ping(self, seqid, iprot, oprot):
-    args = ping_args()
-    args.read(iprot)
-    iprot.readMessageEnd()
-    result = ping_result()
-    try:
-      result.success = self._handler.ping(args.SessionTKT)
-    except AException, allEx:
-      result.allEx = allEx
-    oprot.writeMessageBegin("ping", TMessageType.REPLY, seqid)
-    result.write(oprot)
-    oprot.writeMessageEnd()
-    oprot.trans.flush()
-
   def process_getSession(self, seqid, iprot, oprot):
     args = getSession_args()
     args.read(iprot)
@@ -417,6 +403,20 @@ class Processor(Iface, TProcessor):
     except AException, allEx:
       result.allEx = allEx
     oprot.writeMessageBegin("getSession", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_ping(self, seqid, iprot, oprot):
+    args = ping_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = ping_result()
+    try:
+      result.success = self._handler.ping(args.request)
+    except AException, allEx:
+      result.allEx = allEx
+    oprot.writeMessageBegin("ping", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -514,140 +514,6 @@ class Processor(Iface, TProcessor):
 
 
 # HELPER FUNCTIONS AND STRUCTURES
-
-class ping_args:
-  """
-  Attributes:
-   - SessionTKT
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.STRUCT, 'SessionTKT', (SessionTKT, SessionTKT.thrift_spec), None, ), # 1
-  )
-
-  def __init__(self, SessionTKT=None,):
-    self.SessionTKT = SessionTKT
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.STRUCT:
-          self.SessionTKT = SessionTKT()
-          self.SessionTKT.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('ping_args')
-    if self.SessionTKT is not None:
-      oprot.writeFieldBegin('SessionTKT', TType.STRUCT, 1)
-      self.SessionTKT.write(oprot)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    return
-
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class ping_result:
-  """
-  Attributes:
-   - success
-   - allEx
-  """
-
-  thrift_spec = (
-    (0, TType.STRUCT, 'success', (Pong, Pong.thrift_spec), None, ), # 0
-    (1, TType.STRUCT, 'allEx', (AException, AException.thrift_spec), None, ), # 1
-  )
-
-  def __init__(self, success=None, allEx=None,):
-    self.success = success
-    self.allEx = allEx
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 0:
-        if ftype == TType.STRUCT:
-          self.success = Pong()
-          self.success.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 1:
-        if ftype == TType.STRUCT:
-          self.allEx = AException()
-          self.allEx.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('ping_result')
-    if self.success is not None:
-      oprot.writeFieldBegin('success', TType.STRUCT, 0)
-      self.success.write(oprot)
-      oprot.writeFieldEnd()
-    if self.allEx is not None:
-      oprot.writeFieldBegin('allEx', TType.STRUCT, 1)
-      self.allEx.write(oprot)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    return
-
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
 
 class getSession_args:
   """
@@ -757,6 +623,140 @@ class getSession_result:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('getSession_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    if self.allEx is not None:
+      oprot.writeFieldBegin('allEx', TType.STRUCT, 1)
+      self.allEx.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class ping_args:
+  """
+  Attributes:
+   - request
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'request', (PingRequest, PingRequest.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, request=None,):
+    self.request = request
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.request = PingRequest()
+          self.request.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('ping_args')
+    if self.request is not None:
+      oprot.writeFieldBegin('request', TType.STRUCT, 1)
+      self.request.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class ping_result:
+  """
+  Attributes:
+   - success
+   - allEx
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (PingResponse, PingResponse.thrift_spec), None, ), # 0
+    (1, TType.STRUCT, 'allEx', (AException, AException.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, allEx=None,):
+    self.success = success
+    self.allEx = allEx
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = PingResponse()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.allEx = AException()
+          self.allEx.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('ping_result')
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)

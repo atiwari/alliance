@@ -35,8 +35,14 @@ struct SessionTKT {
 	3: string pki_data
 }
 
-struct Pong {
-	1: string response
+struct PingRequest {
+	1: string cloud_id,
+	2: string request_data
+}
+
+struct PingResponse {
+	1: string cloud_id,
+	2: string response_data
 }
 
 struct TokenWrapper {
@@ -103,9 +109,9 @@ struct SigAuthRequest {
 
 service AllianceService {
 
-  Pong ping(1: SessionTKT SessionTKT) throws (1: AException allEx)  
   SessionTKT getSession(1: SessionTKT SessionTKT) throws (1: AException allEx)
-  
+
+  PingResponse ping(1: PingRequest request) throws (1: AException allEx)  
   TokenResponse validateTokenHard(1: TokenRequest req) throws (1: AException  allEx)
   TokenResponse validateTokenSoft(1: TokenRequest req) throws (1: AException  allEx)
 
