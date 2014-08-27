@@ -12,21 +12,6 @@ Project blue print and details
 ==============================
 https://wiki.openstack.org/wiki/Inter_Cloud_Resource_Federation
 
-Install thrift compiler
-=======================
-http://thrift.apache.org/tutorial/
-
-Compile alliance interface file
-===============================
-
-go to project root and run.
-thrift -out . --gen  py ./thrift/AllianceService.thrift 
-
-to-copy-oslo-common
-===================
-python update.py ../alliance-master
-
-
 Code organization
 =================
 ```
@@ -76,7 +61,22 @@ Why thrift
 1. Need RPC style calls.
 2. Better performance.
 3. Language independent.
-4. can scale better.
+4. Scale better.
+
+Install thrift compiler
+=======================
+Note: This not mandatory
+
+http://thrift.apache.org/tutorial/
+Compile alliance interface file
+===============================
+
+go to project root and run.
+thrift -out . --gen  py ./thrift/AllianceService.thrift 
+
+to-copy-oslo-common
+===================
+python update.py ../alliance-master
 
 How to play with it
 ==================
