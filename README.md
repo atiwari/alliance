@@ -29,7 +29,7 @@ python update.py ../alliance-master
 
 Code organization
 =================
-
+"""
 alliance
     - common
         Common code used by server and client components.
@@ -55,6 +55,7 @@ alliance
         
         - handlers
             These are request handlers, server delegates the incoming requests to these handles.
+"""
 
 Current features
 ================
