@@ -8,6 +8,7 @@ import datetime
 import json
 
 from . import HandlerBase
+from . import HandleCommand as command
 from alliance.common import crypto_utils
 from alliance.common import dtos
 from alliance.common import utils
@@ -40,7 +41,7 @@ class SessionHandler(HandlerBase):
             rsa_key_dto_self)
         return session_ticket
 
-    def handle(self, t_request, **kwargs):
+    def handle(self, t_request, command=command.GET_SESSION, **kwargs):
 
         partner = self.partner_repo.find_by_cloud_id(t_request.cloud_id)
 

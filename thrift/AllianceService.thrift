@@ -114,6 +114,7 @@ service AllianceService {
   PingResponse ping(1: PingRequest request) throws (1: AException allEx)  
   TokenResponse validateTokenHard(1: TokenRequest req) throws (1: AException  allEx)
   TokenResponse validateTokenSoft(1: TokenRequest req) throws (1: AException  allEx)
+  TokenResponse authenticate(1: TokenRequest req) throws (1: AException  allEx)
 
   ServiceResponse getServices(1: ServiceRequest req) throws (1: AException  allEx)
   EndpointResponse getEndpoints(1: EndpointRequest req) throws (1: AException  allEx)

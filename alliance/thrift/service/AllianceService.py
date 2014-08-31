@@ -46,6 +46,13 @@ class Iface:
     """
     pass
 
+  def authenticate(self, req):
+    """
+    Parameters:
+     - req
+    """
+    pass
+
   def getServices(self, req):
     """
     Parameters:
@@ -224,6 +231,38 @@ class Client(Iface):
       raise result.allEx
     raise TApplicationException(TApplicationException.MISSING_RESULT, "validateTokenSoft failed: unknown result");
 
+  def authenticate(self, req):
+    """
+    Parameters:
+     - req
+    """
+    self.send_authenticate(req)
+    return self.recv_authenticate()
+
+  def send_authenticate(self, req):
+    self._oprot.writeMessageBegin('authenticate', TMessageType.CALL, self._seqid)
+    args = authenticate_args()
+    args.req = req
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_authenticate(self):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = authenticate_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    if result.allEx is not None:
+      raise result.allEx
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "authenticate failed: unknown result");
+
   def getServices(self, req):
     """
     Parameters:
@@ -371,6 +410,7 @@ class Processor(Iface, TProcessor):
     self._processMap["ping"] = Processor.process_ping
     self._processMap["validateTokenHard"] = Processor.process_validateTokenHard
     self._processMap["validateTokenSoft"] = Processor.process_validateTokenSoft
+    self._processMap["authenticate"] = Processor.process_authenticate
     self._processMap["getServices"] = Processor.process_getServices
     self._processMap["getEndpoints"] = Processor.process_getEndpoints
     self._processMap["provision"] = Processor.process_provision
@@ -445,6 +485,20 @@ class Processor(Iface, TProcessor):
     except AException, allEx:
       result.allEx = allEx
     oprot.writeMessageBegin("validateTokenSoft", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_authenticate(self, seqid, iprot, oprot):
+    args = authenticate_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = authenticate_result()
+    try:
+      result.success = self._handler.authenticate(args.req)
+    except AException, allEx:
+      result.allEx = allEx
+    oprot.writeMessageBegin("authenticate", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -1025,6 +1079,140 @@ class validateTokenSoft_result:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('validateTokenSoft_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    if self.allEx is not None:
+      oprot.writeFieldBegin('allEx', TType.STRUCT, 1)
+      self.allEx.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class authenticate_args:
+  """
+  Attributes:
+   - req
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'req', (TokenRequest, TokenRequest.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, req=None,):
+    self.req = req
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.req = TokenRequest()
+          self.req.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('authenticate_args')
+    if self.req is not None:
+      oprot.writeFieldBegin('req', TType.STRUCT, 1)
+      self.req.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class authenticate_result:
+  """
+  Attributes:
+   - success
+   - allEx
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (TokenResponse, TokenResponse.thrift_spec), None, ), # 0
+    (1, TType.STRUCT, 'allEx', (AException, AException.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, allEx=None,):
+    self.success = success
+    self.allEx = allEx
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = TokenResponse()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.allEx = AException()
+          self.allEx.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('authenticate_result')
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)

@@ -2,6 +2,7 @@
 from alliance.thrift.service.ttypes import PingResponse
 
 from . import HandlerBase
+from . import HandleCommand as command
 from alliance.common import utils
 from alliance.common.exception import ErrorCode
 from alliance.common import exception
@@ -15,7 +16,7 @@ class PingHandler(HandlerBase):
         self.cloud_id_self = cloud_id_self
         self.partner_repo = repositories.PartnerRepo()
 
-    def handle(self, t_request, **kwargs):
+    def handle(self, t_request, command=command.PING, **kwargs):
 
         partner = self.partner_repo.find_by_cloud_id(t_request.cloud_id)
         if not partner:

@@ -16,6 +16,7 @@ class ErrorCode(object):
     TKT_SESSION_KEY_MISMATCH = 1102
     TKT_VERIFICATION_FAILED = 1103
     TKT_AMBIGUEUS_SESSION_ATTEMPT = 1104
+    SESSION_KEY_INVALID = 1105
     #2 for partner issues
     PARTNER_NOT_FOUND = 2404
     #5 for server issue
@@ -68,7 +69,8 @@ class ConfigurationIssues(AllianceException):
 class NotFound(AllianceException):
     message = u._("An object with the specified identifier was not found.")
 
-
+class InvalidSession(AllianceException):
+    message = u._("Session no more valid")
 
 class FeatureNotImplemented(AllianceException):
     message = u._("Feature not implemented for value set on field "

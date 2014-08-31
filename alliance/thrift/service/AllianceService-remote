@@ -27,6 +27,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '  PingResponse ping(PingRequest request)'
   print '  TokenResponse validateTokenHard(TokenRequest req)'
   print '  TokenResponse validateTokenSoft(TokenRequest req)'
+  print '  TokenResponse authenticate(TokenRequest req)'
   print '  ServiceResponse getServices(ServiceRequest req)'
   print '  EndpointResponse getEndpoints(EndpointRequest req)'
   print '  ProvisioningResponse provision(ProvisioningRequest req)'
@@ -107,6 +108,12 @@ elif cmd == 'validateTokenSoft':
     print 'validateTokenSoft requires 1 args'
     sys.exit(1)
   pp.pprint(client.validateTokenSoft(eval(args[0]),))
+
+elif cmd == 'authenticate':
+  if len(args) != 1:
+    print 'authenticate requires 1 args'
+    sys.exit(1)
+  pp.pprint(client.authenticate(eval(args[0]),))
 
 elif cmd == 'getServices':
   if len(args) != 1:

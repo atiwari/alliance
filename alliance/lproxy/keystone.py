@@ -5,8 +5,8 @@ Created on Aug 6, 2014
 '''
 import os
 from oslo.config import cfg
-#from keystoneclient.v2_0 import client
-from keystoneclient.v3 import client
+#from keystoneclient.v2_0 import client as v2client
+from keystoneclient.v3 import client as v3client 
 from keystoneclient.middleware import auth_token 
 
 from alliance.common import config
@@ -51,23 +51,52 @@ class KeystoneProxy(object):
                  auth_url='http://localhost:35357/v3',
                  debug=True, **kwargs):
 
-        self.keystone = client.Client(username='barbican',
+        self.keystone = v3client.Client(username='barbican',
                                       password='orange',
                                       tenant_name='service',
                                       auth_url='http://localhost:35357/v3',
                                       debug=True)
 
-    def validate_token(self, token_id, project_id=None, project_name=None):
+    def validate_token(self, token_id,
+                       project_id=None,
+                       project_name=None):
         if token_id:
             return auth_token.AuthProtocol(None, CONF.keystone).verify_uuid_token(token_id, retry=True)
 
     def validate_token_soft(self, token_id=None):
-        pass
+        try:
+            if self.validate_token(token_id):
+                return True
+            else:
+                return False
+        except Exception:
+            return False
 
-    def create_token(self, username=None,
+    def create_token(self, auth_url='http://localhost:35357/v3',
+                     username=None,
                      password=None,
-                     tenant_name=None):
+                     project_name=None,
+                     project_domain_id=None,
+                     user_domain_id=None):
+        
+        #This is not the best impl
+        aclient = v3client.Client(auth_url=auth_url,
+                                  username=username,
+                                  password=password,
+                                  project_name=project_name,
+                                  project_domain_id=project_domain_id,
+                                  user_domain_id=user_domain_id)
+        return aclient.get_raw_token_from_identity_service(auth_url=auth_url,
+                                                           username=username,
+                                                           password=password,
+                                                           project_name=project_name,
+                                                           project_domain_id=project_domain_id,
+                                                           user_domain_id=user_domain_id)
+        
+    
+    def delete_token(self, token_id=None):
         pass
+        #no v3 client api
 
     def get_service(self, service_id=None):
         if service_id:
@@ -83,7 +112,6 @@ class KeystoneProxy(object):
         tenant = self.keystone.tenants.create(tenant_name=project_name,
                                               description="project for %s" %owner,
                                               enabled=True)
-        print tenant
         tenant.delete()
 
 
@@ -93,5 +121,12 @@ if __name__ == '__main__':
     #print ks_proxy.get_service('f17fe3f0648440229f42cd101c2360d2')
     #print ks_proxy.get_endpoints(service='57b17d5dd86d47a8a635271cf2a9ee8f')
     #print ks_proxy.get_service('57b17d5dd86d47a8a635271cf2a9ee8f')
-    #print ks_proxy.validate_token('01d2a79a84184c52a8564cd78879eab9')
+    print ks_proxy.validate_token_soft('18cf348c2634498d837fdd0e381862df')
+    #print ks_proxy.create_token(username='lbuser',
+    #                      password='changeit',
+    #                      auth_url='http://localhost:35357/v3',
+    #                      project_name='lbaas-user-project01',
+    #                      project_domain_id='f7894f7eab9a463a990eb6dd6f13bda4',
+    #                      user_domain_id='f7894f7eab9a463a990eb6dd6f13bda4')
+    #ks_proxy.delete_token(token_id='18cf348c2634498d837fdd0e381862df')
     

@@ -20,7 +20,9 @@ Compile alliance interface file
 ===============================
 
 go to project root and run.
+```
 thrift -out . --gen  py ./thrift/AllianceService.thrift 
+```
 
 to-copy-oslo-common
 ===================
@@ -88,10 +90,12 @@ How to play with it
 4. to setup db. run WhenTestingPartnerRepo test from alliance/tests/model, this is kind of bootstrap script for now.
 5. run the alliance server "alliance/tserver/alliance_server.py" has main block.
 6. run "alliance/rproxy/ping.py"
+
     ```
     if you are getting "###### Fun playing ping, pong with my-east-cloud-or-dc" that means you are good. 
     ```
 7. now run "alliance/rproxy/session.py", if you are getting below response that means you are good.
+
         ```
         my-east-cloud-or-dc
         rB6vxK/Wp9eBdjJRX21mn48xb3rXLfBwUrEjnyhhM08=

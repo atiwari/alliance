@@ -14,10 +14,12 @@ class TokenType(object):
     UUID = 'uuid'
     PKI = 'pik'
 
-class ValidationCode(object):
+class OprCode(object):
     VALID = 'valid'
     INVALID = 'invalid'
     INDETERMINATE = 'indeterminate'
+    OK = 'ok'
+    NOT_FOUND = 'not_found'
 
 
 class KeyDTO(object):
@@ -49,9 +51,21 @@ class SessionDTO(json.JSONEncoder):
 class AuthTokenDTO(json.JSONEncoder):
     """DTO for token interchange"""
     def __init__(self, json=None):
-        self.cloud_id = json.get('cloud_id') if json else None
+        #self.cloud_id = json.get('cloud_id') if json else None
         self.token_id = json.get('token_id') if json else None
         self.token_type = json.get('token_type') if json else None
         self.token_str = json.get('token_str') if json else None
-        self.validation_code = json.get('validation_code') if json else None
+        self.opr_code = json.get('opr_code') if json else None
         self.details = json.get('details') if json else None
+
+class AuthDTO(json.JSONEncoder):
+    """DTO for token interchange"""
+    def __init__(self, json=None):
+        #self.cloud_id = json.get('cloud_id') if json else None
+        self.username = json.get('username') if json else None
+        self.user_id = json.get('user_id') if json else None
+        self.user_domain_id = json.get('user_domain_id') if json else None
+        self.password = json.get('password') if json else None
+        self.project_domain_id = json.get('project_domain_id') if json else None
+        self.project_id = json.get('project_id') if json else None
+        self.project_name = json.get('project_name') if json else None
