@@ -92,13 +92,15 @@ if __name__ == '__main__':
         cloud_id_target = 'my-east-cloud-or-dc'
         alliance_client = alliance_client.AllianceClient(cloud_id_target='my-east-cloud-or-dc')
         authResource = AuthResource(allianceClient=alliance_client, cloud_id_self='my-west-cloud-or-dc')
-        #auth_response = authResource.validate_uuid_token_hard(cloud_id_target, "64ce0f3ea36e41e2b8f8598bd7419820")
+        #auth_response = authResource.validate_uuid_token_hard(cloud_id_target, "5672e4ee84494993a829fe668e673c52")
+
         auth_response = authResource.get_token(cloud_id_target,
                                                username='lbuser',
                                                password='changeit',
                                                user_domain_id='f7894f7eab9a463a990eb6dd6f13bda4',
                                                project_name='lbaas-user-project01',
                                                project_domain_id='f7894f7eab9a463a990eb6dd6f13bda4')
+
         print auth_response.opr_code
     except AException as e:
         print e
